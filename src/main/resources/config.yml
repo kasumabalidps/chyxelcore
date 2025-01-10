@@ -2,11 +2,13 @@
 
 prefix_message: "&d&lCHYXELCORE &r&7➟ "
 
+# Konfigurasi Pesan Join
 messages:
   first-join: "&6🏴 Welcome ➟&e&l%player%&c has join for the&efirst&rtime! please do&e/welcome %player%"
   join: "&b%player%&7 joined the game, go survive and have fun!"
   quit: "&c%player%&7 left the game, see you next time!"
 
+# Konfigurasi Spawn Awal Player Join
 spawn:
   world: "spawnbaru"
   x: -63
@@ -15,6 +17,18 @@ spawn:
   yaw: 268.5
   pitch: -0.26
 
+# Konfigurasi Last Location
+last-location:
+  enabled: true
+  save-on:
+    quit: true
+    world-change: true
+    teleport: true
+  blacklisted-worlds:
+    - "spawnbaru"
+    - "minigames"
+
+# Konfigurasi RTP
 rtp:
   enabled-worlds:
     world:  # overworld

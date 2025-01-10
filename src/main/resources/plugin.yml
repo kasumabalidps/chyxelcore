@@ -27,3 +27,5 @@ permissions:
   chyxelcore.rtp:
     description: Allows using RTP command
     default: true
+
+softdepend: [Multiverse-Core, Multiverse-Portals]

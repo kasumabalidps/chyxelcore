@@ -21,6 +21,11 @@
 			<id>spigot-repo</id>
 			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
+		<!-- Multiverse Repository -->
+		<repository>
+			<id>OnARandomBox</id>
+			<url>https://repo.onarandombox.com/content/groups/public/</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
@@ -35,6 +40,19 @@
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
 			<version>1.21.3-R0.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- Multiverse Dependencies -->
+		<dependency>
+			<groupId>com.onarandombox.multiversecore</groupId>
+			<artifactId>Multiverse-Core</artifactId>
+			<version>4.3.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.onarandombox.multiverseportals</groupId>
+			<artifactId>Multiverse-Portals</artifactId>
+			<version>4.2.1</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
