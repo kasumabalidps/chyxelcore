@@ -1,0 +1,29 @@
+name: chyxelcore
+main: id.kasuma.Plugin
+version: 0.0.1
+api-version: 1.21.3
+
+commands:
+  chyxel:
+    description: Plugin core command
+    usage: /<command> reload
+    permission: chyxelcore.admin
+  rtp:
+    description: Teleport ke lokasi acak
+    usage: /<command>
+    aliases: [wild]
+    permission: chyxelcore.rtp
+
+permissions:
+  chyxelcore.joinmessage:
+    description: Allows custom join messages
+    default: true
+  chyxelcore.quitmessage:
+    description: Allows custom quit messages
+    default: true
+  chyxelcore.admin:
+    description: Admin commands access
+    default: op
+  chyxelcore.rtp:
+    description: Allows using RTP command
+    default: true

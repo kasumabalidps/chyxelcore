@@ -1,0 +1,41 @@
+# ChyxelCore Configuration
+
+prefix_message: "&d&lCHYXELCORE &r&7➟ "
+
+messages:
+  first-join: "&6🏴 Welcome ➟&e&l%player%&c has join for the&efirst&rtime! please do&e/welcome %player%"
+  join: "&b%player%&7 joined the game, go survive and have fun!"
+  quit: "&c%player%&7 left the game, see you next time!"
+
+spawn:
+  world: "spawnbaru"
+  x: -63
+  y: 72
+  z: 0
+  yaw: 268.5
+  pitch: -0.26
+
+rtp:
+  enabled-worlds:
+    world:  # overworld
+      enabled: true
+      max-radius: 10000
+      min-y: 62
+      max-y: 255
+    world_nether:
+      enabled: true
+      max-radius: 5000
+      min-y: 30
+      max-y: 120
+    world_the_end:
+      enabled: true
+      max-radius: 5000
+      min-y: 45
+      max-y: 180
+  messages:
+    success: "&aKamu telah diteleport ke lokasi acak!"
+    searching: "&eMencari lokasi yang aman..."
+    failed: "&cTidak dapat menemukan lokasi yang aman. Silakan coba lagi!"
+    wrong-world: "&cKamu tidak bisa menggunakan RTP di dunia ini!"
+    cooldown: "&cKamu harus menunggu &e%time% &cdetik lagi!"
+  cooldown: 300  # dalam detik (5 menit) 
