@@ -8,37 +8,40 @@ import org.bukkit.ChatColor;
 public class TeleportManager {
     private final Plugin plugin;
     private final LocationManager locationManager;
+    private final String prefix;
 
     public TeleportManager(Plugin plugin, LocationManager locationManager) {
         this.plugin = plugin;
         this.locationManager = locationManager;
+        this.prefix = plugin.getConfig().getString("prefix_message", "");
     }
 
     public Location handleTeleport(Player player, Location from, Location to) {
-        // Skip jika bukan perpindahan antar world
-        if (from == null || to == null || from.getWorld().equals(to.getWorld())) {
-            return null;
-        }
+        if (!isValidTeleport(from, to)) return null;
 
         String fromWorld = from.getWorld().getName();
         String toWorld = to.getWorld().getName();
 
-        // 1. Simpan lokasi world yang ditinggalkan
-        if (!isWorldBlacklisted(fromWorld)) {
+        handleFromWorld(player, from, fromWorld);
+        return handleToWorld(player, to, toWorld);
+    }
+
+    private boolean isValidTeleport(Location from, Location to) {
+        return from != null && to != null && !from.getWorld().equals(to.getWorld());
+    }
+
+    private void handleFromWorld(Player player, Location from, String worldName) {
+        if (!isWorldBlacklisted(worldName)) {
             locationManager.savePlayerLocation(player, from);
-            sendSaveMessage(player, fromWorld);
+            sendSaveMessage(player, worldName);
         }
+    }
 
-        // 2. Cek dan teleport ke lokasi tersimpan
-        if (!isWorldBlacklisted(toWorld)) {
-            Location lastLoc = locationManager.getLastLocation(player, toWorld);
-            if (lastLoc != null) {
-                return lastLoc;
-            }
-        }
-
-        // 3. Gunakan lokasi default jika tidak ada lokasi tersimpan
-        return to;
+    private Location handleToWorld(Player player, Location to, String worldName) {
+        if (isWorldBlacklisted(worldName)) return to;
+        
+        Location lastLoc = locationManager.getLastLocation(player, worldName);
+        return lastLoc != null ? lastLoc : to;
     }
 
     private boolean isWorldBlacklisted(String worldName) {
@@ -47,9 +50,8 @@ public class TeleportManager {
     }
 
     private void sendSaveMessage(Player player, String worldName) {
-        String message = plugin.getConfig().getString("last-location.messages.saved")
+        String message = plugin.getConfig().getString("last-location.messages.saved", "")
                 .replace("%world%", worldName);
-        player.sendMessage(ChatColor.translateAlternateColorCodes('&', 
-            plugin.getConfig().getString("prefix_message") + message));
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + message));
     }
 } 

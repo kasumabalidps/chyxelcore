@@ -20,28 +20,41 @@ public class Plugin extends JavaPlugin
   @Override
   public void onEnable()
   {
-    // Save default config
+    try {
+      initializePlugin();
+      LOGGER.info("ChyxelCore Successfully Enabled!");
+    } catch (Exception e) {
+      LOGGER.severe("Failed to enable ChyxelCore: " + e.getMessage());
+      getServer().getPluginManager().disablePlugin(this);
+    }
+  }
+
+  private void initializePlugin() {
     saveDefaultConfig();
-    
-    // Initialize managers
+    initializeManagers();
+    registerListeners();
+    registerCommands();
+    LOGGER.info("ChyxelCore is loading...");
+  }
+
+  private void initializeManagers() {
     multiverseManager = new MultiverseManager(this);
     locationManager = new LocationManager(this);
     teleportManager = new TeleportManager(this, locationManager);
-    
+
     if (!multiverseManager.isEnabled()) {
       LOGGER.warning("Multiverse-Core not found! Some features may not work properly.");
     }
-    
-    // Event Listener lists
+  }
+
+  private void registerListeners() {
     getServer().getPluginManager().registerEvents(new PlayerConnectionListener(this), this);
     getServer().getPluginManager().registerEvents(new PlayerWorldListener(this, locationManager), this);
-    
-    // Register commands
+  }
+
+  private void registerCommands() {
     getCommand("chyxel").setExecutor(new CoreCommand(this));
     getCommand("rtp").setExecutor(new RTPCommand(this));
-    
-    LOGGER.info("ChyxelCore is loading...");
-    LOGGER.info("ChyxelCore Successfully Enabled!");
   }
 
   @Override

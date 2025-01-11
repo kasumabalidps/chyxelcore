@@ -20,89 +20,73 @@ public class LocationManager {
         this.plugin = plugin;
         this.dataFolder = new File(plugin.getDataFolder(), "player_locations");
         this.lastLocations = new ConcurrentHashMap<>();
-        
+        createDataFolder();
+    }
+
+    private void createDataFolder() {
         if (!dataFolder.exists() && !dataFolder.mkdirs()) {
             plugin.getLogger().warning("Failed to create player_locations directory!");
         }
     }
 
     public void savePlayerLocation(Player player, Location location) {
-        String worldName = location.getWorld().getName();
-        
-        plugin.getLogger().info("=== SAVE LOCATION DEBUG ===");
-        plugin.getLogger().info("Player: " + player.getName());
-        plugin.getLogger().info("World: " + worldName);
-        plugin.getLogger().info("Location: " + formatLocation(location));
-        plugin.getLogger().info("Blacklisted: " + plugin.getConfig().getStringList("last-location.blacklisted-worlds").contains(worldName));
-        plugin.getLogger().info("Enabled: " + plugin.getConfig().getBoolean("last-location.enabled", true));
-
-        // Cek apakah world di blacklist
-        if (plugin.getConfig().getStringList("last-location.blacklisted-worlds").contains(worldName)) {
-            plugin.getLogger().info("Skipping save - World is blacklisted");
-            return;
-        }
-
-        // Cek apakah fitur diaktifkan
-        if (!plugin.getConfig().getBoolean("last-location.enabled", true)) {
-            plugin.getLogger().info("Skipping save - Feature is disabled");
-            return;
-        }
+        if (!isValidSave(location.getWorld().getName())) return;
 
         UUID playerId = player.getUniqueId();
         HashMap<String, Location> playerLocations = lastLocations.computeIfAbsent(playerId, k -> new HashMap<>());
-        playerLocations.put(worldName, location.clone());
-        plugin.getLogger().info("Location saved to memory cache");
+        playerLocations.put(location.getWorld().getName(), location.clone());
 
-        // Save async dengan BukkitRunnable
+        saveAsync(player, playerLocations);
+    }
+
+    private boolean isValidSave(String worldName) {
+        return plugin.getConfig().getBoolean("last-location.enabled", true) && 
+               !plugin.getConfig().getStringList("last-location.blacklisted-worlds").contains(worldName);
+    }
+
+    private void saveAsync(Player player, HashMap<String, Location> locations) {
         new BukkitRunnable() {
             @Override
             public void run() {
-                saveToFile(player, playerLocations);
-                plugin.getLogger().info("Location saved to file");
+                saveToFile(player.getUniqueId(), locations);
             }
         }.runTaskAsynchronously(plugin);
     }
 
-    private void saveToFile(Player player, HashMap<String, Location> playerLocations) {
-        File playerFile = new File(dataFolder, player.getUniqueId().toString() + ".yml");
-        YamlConfiguration config = new YamlConfiguration();
-        
-        for (String world : playerLocations.keySet()) {
-            config.set("locations." + world, playerLocations.get(world));
-        }
-        
+    private void saveToFile(UUID playerId, HashMap<String, Location> locations) {
         try {
-            config.save(playerFile);
+            YamlConfiguration config = new YamlConfiguration();
+            locations.forEach((world, loc) -> config.set("locations." + world, loc));
+            config.save(new File(dataFolder, playerId.toString() + ".yml"));
         } catch (IOException e) {
-            plugin.getLogger().warning("Failed to save location for player: " + player.getName());
-            e.printStackTrace();
+            plugin.getLogger().warning("Failed to save location data: " + e.getMessage());
         }
     }
 
     public Location getLastLocation(Player player, String worldName) {
+        HashMap<String, Location> locations = getPlayerLocations(player);
+        Location loc = locations != null ? locations.get(worldName) : null;
+        return loc != null ? loc.clone() : null;
+    }
+
+    private HashMap<String, Location> getPlayerLocations(Player player) {
         UUID playerId = player.getUniqueId();
         if (!lastLocations.containsKey(playerId)) {
             loadPlayerData(player);
         }
-        
-        HashMap<String, Location> playerLocations = lastLocations.get(playerId);
-        Location loc = playerLocations != null ? playerLocations.get(worldName) : null;
-        return loc != null ? loc.clone() : null; // Clone untuk keamanan
+        return lastLocations.get(playerId);
     }
 
     private void loadPlayerData(Player player) {
-        File playerFile = new File(dataFolder, player.getUniqueId().toString() + ".yml");
-        if (!playerFile.exists()) {
-            return;
-        }
+        File file = new File(dataFolder, player.getUniqueId().toString() + ".yml");
+        if (!file.exists()) return;
 
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(playerFile);
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
         HashMap<String, Location> locations = new HashMap<>();
         
         if (config.contains("locations")) {
-            for (String world : config.getConfigurationSection("locations").getKeys(false)) {
-                locations.put(world, config.getLocation("locations." + world));
-            }
+            config.getConfigurationSection("locations").getKeys(false)
+                 .forEach(world -> locations.put(world, config.getLocation("locations." + world)));
         }
         
         lastLocations.put(player.getUniqueId(), locations);
@@ -110,14 +94,6 @@ public class LocationManager {
 
     public void clearPlayerData(UUID playerId) {
         lastLocations.remove(playerId);
-        File playerFile = new File(dataFolder, playerId.toString() + ".yml");
-        if (playerFile.exists()) {
-            playerFile.delete();
-        }
-    }
-
-    private String formatLocation(Location loc) {
-        return String.format("x:%.2f y:%.2f z:%.2f yaw:%.2f pitch:%.2f", 
-            loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        new File(dataFolder, playerId.toString() + ".yml").delete();
     }
 } 
