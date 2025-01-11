@@ -24,9 +24,12 @@ last-location:
     quit: true
     world-change: true
     teleport: true
+    death: true
   blacklisted-worlds:
     - "spawnbaru"
     - "minigames"
+  messages:
+    saved: "&aLokasi terakhirmu di dunia &e%world% &atelah disimpan!"
 
 # Konfigurasi RTP
 rtp:

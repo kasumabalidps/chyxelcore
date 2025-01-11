@@ -8,12 +8,14 @@ import id.kasuma.commands.CoreCommand;
 import id.kasuma.commands.RTPCommand;
 import id.kasuma.managers.LocationManager;
 import id.kasuma.managers.MultiverseManager;
+import id.kasuma.managers.TeleportManager;
 
 public class Plugin extends JavaPlugin
 {
   private static final Logger LOGGER=Logger.getLogger("chyxelcore");
   private LocationManager locationManager;
   private MultiverseManager multiverseManager;
+  private TeleportManager teleportManager;
 
   @Override
   public void onEnable()
@@ -24,6 +26,7 @@ public class Plugin extends JavaPlugin
     // Initialize managers
     multiverseManager = new MultiverseManager(this);
     locationManager = new LocationManager(this);
+    teleportManager = new TeleportManager(this, locationManager);
     
     if (!multiverseManager.isEnabled()) {
       LOGGER.warning("Multiverse-Core not found! Some features may not work properly.");
@@ -31,22 +34,27 @@ public class Plugin extends JavaPlugin
     
     // Event Listener lists
     getServer().getPluginManager().registerEvents(new PlayerConnectionListener(this), this);
-    getServer().getPluginManager().registerEvents(new PlayerWorldListener(this, locationManager, multiverseManager), this);
+    getServer().getPluginManager().registerEvents(new PlayerWorldListener(this, locationManager), this);
     
     // Register commands
     getCommand("chyxel").setExecutor(new CoreCommand(this));
     getCommand("rtp").setExecutor(new RTPCommand(this));
     
-    LOGGER.info("chyxelcore enabled");
+    LOGGER.info("ChyxelCore is loading...");
+    LOGGER.info("ChyxelCore Successfully Enabled!");
   }
 
   @Override
   public void onDisable()
   {
-    LOGGER.info("chyxelcore disabled");
+    LOGGER.info("ChyxelCore Successfully Disabled!");
   }
 
   public MultiverseManager getMultiverseManager() {
     return multiverseManager;
+  }
+
+  public TeleportManager getTeleportManager() {
+    return teleportManager;
   }
 }

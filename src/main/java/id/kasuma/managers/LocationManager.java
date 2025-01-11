@@ -27,28 +27,40 @@ public class LocationManager {
     }
 
     public void savePlayerLocation(Player player, Location location) {
-        if (!isLocationSaveEnabled(player, location)) return;
+        String worldName = location.getWorld().getName();
+        
+        plugin.getLogger().info("=== SAVE LOCATION DEBUG ===");
+        plugin.getLogger().info("Player: " + player.getName());
+        plugin.getLogger().info("World: " + worldName);
+        plugin.getLogger().info("Location: " + formatLocation(location));
+        plugin.getLogger().info("Blacklisted: " + plugin.getConfig().getStringList("last-location.blacklisted-worlds").contains(worldName));
+        plugin.getLogger().info("Enabled: " + plugin.getConfig().getBoolean("last-location.enabled", true));
+
+        // Cek apakah world di blacklist
+        if (plugin.getConfig().getStringList("last-location.blacklisted-worlds").contains(worldName)) {
+            plugin.getLogger().info("Skipping save - World is blacklisted");
+            return;
+        }
+
+        // Cek apakah fitur diaktifkan
+        if (!plugin.getConfig().getBoolean("last-location.enabled", true)) {
+            plugin.getLogger().info("Skipping save - Feature is disabled");
+            return;
+        }
 
         UUID playerId = player.getUniqueId();
         HashMap<String, Location> playerLocations = lastLocations.computeIfAbsent(playerId, k -> new HashMap<>());
-        playerLocations.put(location.getWorld().getName(), location.clone()); // Clone untuk keamanan
+        playerLocations.put(worldName, location.clone());
+        plugin.getLogger().info("Location saved to memory cache");
 
         // Save async dengan BukkitRunnable
         new BukkitRunnable() {
             @Override
             public void run() {
                 saveToFile(player, playerLocations);
+                plugin.getLogger().info("Location saved to file");
             }
         }.runTaskAsynchronously(plugin);
-    }
-
-    private boolean isLocationSaveEnabled(Player player, Location location) {
-        if (!plugin.getConfig().getBoolean("last-location.enabled", true)) {
-            return false;
-        }
-
-        String worldName = location.getWorld().getName();
-        return !plugin.getConfig().getStringList("last-location.blacklisted-worlds").contains(worldName);
     }
 
     private void saveToFile(Player player, HashMap<String, Location> playerLocations) {
@@ -102,5 +114,10 @@ public class LocationManager {
         if (playerFile.exists()) {
             playerFile.delete();
         }
+    }
+
+    private String formatLocation(Location loc) {
+        return String.format("x:%.2f y:%.2f z:%.2f yaw:%.2f pitch:%.2f", 
+            loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
     }
 } 
