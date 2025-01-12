@@ -13,6 +13,14 @@ commands:
     usage: /<command>
     aliases: [wild]
     permission: chyxelcore.rtp
+  spawn:
+    description: Teleport ke spawn
+    usage: /<command>
+    permission: chyxelcore.spawn
+  setspawn:
+    description: Set lokasi spawn
+    usage: /<command>
+    permission: chyxelcore.admin
 
 permissions:
   chyxelcore.joinmessage:

@@ -1,0 +1,16 @@
+spawn:
+  messages:
+    console-error: "&a&lTELEPORT&r &7➟ &cCommand ini hanya bisa digunakan oleh player!"
+    no-permission: "&a&lTELEPORT&r &7➟ &cKamu tidak memiliki izin untuk menggunakan command ini!"
+    not-set: "&a&lTELEPORT&r &7➟ &cSpawn point belum diatur!"
+    world-not-found: "&a&lTELEPORT&r &7➟ &cWorld spawn tidak ditemukan!"
+    teleport-start: "&a&lTELEPORT&r &7➟ &fTeleportasi akan dimulai dalam %time% detik. &7« Don't move! »"
+    teleport-countdown: "&a&lTELEPORT&r &7➟ &fTeleportasi dalam %time% detik..."
+    teleport-cancelled: "&a&lTELEPORT&r &7➟ &cTeleportasi dibatalkan karena kamu bergerak!"
+    teleport-success: "&a&lTELEPORT&r &7➟ &aBerhasil teleport ke spawn!"
+
+setspawn:
+  messages:
+    console-error: "&a&lTELEPORT&r &7➟ &cCommand ini hanya bisa digunakan oleh player!"
+    no-permission: "&a&lTELEPORT&r &7➟ &cKamu tidak memiliki izin untuk menggunakan command ini!"
+    success: "&a&lTELEPORT&r &7➟ &aSpawn point berhasil diatur!"
